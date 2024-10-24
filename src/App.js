@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Para realizar requisições HTTP
-import { Content, Result, Search, VideoBackground,ResultInfo } from './styles';
+import { Content, Result, Search, VideoBackground, ResultInfo } from './styles';
 import Button from './components/Button';
 import Input from './components/Input';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Importar Bootstrap CSS
@@ -17,6 +17,7 @@ function App() {
   const [weatherData, setWeatherData] = useState(null); // Estado para armazenar os dados do clima
   const [error, setError] = useState(''); // Estado para gerenciar erros
   const [videoSource, setVideoSource] = useState(defaultVideo); // Estado para armazenar o vídeo de fundo
+  const [loading, setLoading] = useState(false); // Estado para gerenciar o carregamento
 
   // Objeto com vídeos de fundo para diferentes tipos de clima
   const weatherVideos = {
@@ -29,6 +30,7 @@ function App() {
   // Função para buscar dados do clima
   const fetchWeather = async () => {
     const apiKey = '22bc778cc92dc64dd956a97578bf0abf'; // Chave da API
+    setLoading(true); // Inicia o carregamento
     try {
       console.log('Cidade pesquisada:', city); // Verificando a cidade
       const response = await axios.get(
@@ -51,6 +53,8 @@ function App() {
       setVideoSource(weatherVideos['Default']); // Reverter para o vídeo padrão em caso de erro
       console.error('Erro:', err); // Para ver mais detalhes do erro
       setError('Cidade não encontrada.');
+    } finally {
+      setLoading(false); // Finaliza o carregamento
     }
   };
 
@@ -72,10 +76,12 @@ function App() {
 
       <Content>
         {/* Vídeo de fundo */}
-        <VideoBackground autoPlay muted loop key={videoSource}>
+        <VideoBackground autoPlay muted loop playsInline key={videoSource}>
           <source src={videoSource} type="video/mp4" />
           Seu navegador não suporta a reprodução de vídeos.
         </VideoBackground>
+
+        {loading && <div>Carregando...</div>} {/* Exibir carregador */}
 
         <Search>
           <Input 
@@ -87,32 +93,30 @@ function App() {
         </Search>
 
         {error && (
-  <p style={{ color: 'red', marginTop: '1vw', background: '#b5b5b5', padding: '1vw', borderRadius: '10px', fontWeight: 'bold' }}>
-    {error}
-  </p>
-)} {/* Exibir mensagem de erro */}
+          <p style={{ color: 'red', marginTop: '1vw', background: '#b5b5b5', padding: '1vw', borderRadius: '10px', fontWeight: 'bold' }}>
+            {error}
+          </p>
+        )} {/* Exibir mensagem de erro */}
         
-{weatherData && (
-  <Result>
-    <div style={ {marginRight: '5vw'}}>
-       <h2>{weatherData.name}</h2>
-       <p>Temperatura: {weatherData.main.temp}°C</p>
-    </div>
-    <div>
-      <ResultInfo>Sensação térmica: {weatherData.main.feels_like}°C</ResultInfo>
-      <ResultInfo>Condição: {weatherData.weather[0].description}</ResultInfo>
-      <ResultInfo>Umidade: {weatherData.main.humidity}%</ResultInfo>
-      <ResultInfo>Pressão: {weatherData.main.pressure} hPa</ResultInfo>
-      <ResultInfo>Velocidade do vento: {weatherData.wind.speed} m/s</ResultInfo>
-      <ResultInfo>Visibilidade: {weatherData.visibility / 1000} km</ResultInfo>
-      <ResultInfo>Nuvens: {weatherData.clouds.all}%</ResultInfo>
-      <ResultInfo>Nascer do sol: {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}</ResultInfo>
-      <ResultInfo>Pôr do sol: {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString()}</ResultInfo>
-    </div>
-   
-  </Result>
-)}
-
+        {weatherData && (
+          <Result>
+            <div style={ {marginRight: '5vw'}}>
+               <h2>{weatherData.name}</h2>
+               <p>Temperatura: {weatherData.main.temp}°C</p>
+            </div>
+            <div>
+              <ResultInfo>Sensação térmica: {weatherData.main.feels_like}°C</ResultInfo>
+              <ResultInfo>Condição: {weatherData.weather[0].description}</ResultInfo>
+              <ResultInfo>Umidade: {weatherData.main.humidity}%</ResultInfo>
+              <ResultInfo>Pressão: {weatherData.main.pressure} hPa</ResultInfo>
+              <ResultInfo>Velocidade do vento: {weatherData.wind.speed} m/s</ResultInfo>
+              <ResultInfo>Visibilidade: {weatherData.visibility / 1000} km</ResultInfo>
+              <ResultInfo>Nuvens: {weatherData.clouds.all}%</ResultInfo>
+              <ResultInfo>Nascer do sol: {new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}</ResultInfo>
+              <ResultInfo>Pôr do sol: {new Date(weatherData.sys.sunset * 1000).toLocaleTimeString()}</ResultInfo>
+            </div>
+          </Result>
+        )}
       </Content>
     </div>
   );
