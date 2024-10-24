@@ -38,8 +38,8 @@ export const Search = styled.div`
 
 export const Result = styled.div`
   z-index: 1; /* Coloca o conteúdo acima do vídeo */
-  background: white;
-  padding: 25px;
+  color: white;
+  background: #000000ad;  padding: 25px;
   border-radius: 10px;
   margin-top: 20px;
   font-size: 12px;
